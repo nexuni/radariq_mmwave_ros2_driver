@@ -90,22 +90,12 @@ These instructions explain how to incorporate RadarIQ into an existing ROS works
 
 ## Steps
 
-1. Adjust the module settings
+1. Start the pointcloud publisher node
 
-   The module settings such as distance filters, angle filters etc can adjusted using a launch file.
+   ``ros2 launch radariq_ros_driver radariq_pointcloud.launch.py``
 
-   The default launch file is located: ``src/radariq_ros/radariq_ros_driver/launch/radariq.launch``
+2. Start the test application
 
-2. Start ROS core
+   ``ros2 run radariq_ros_driver example_application``
 
-   ``roscore``
-
-3. Start the publisher node
-
-   ``rosrun radariq_ros_driver publisher_node.py``
-
-4. Start the test application
-
-   ``rosrun radariq_ros_driver test_radariq.launch``
-
-Raw data should be echoed out to the ROS log (see ``example_application.py`)
+Raw data should be echoed out to the screen

@@ -40,7 +40,7 @@ class RadarIQExampleApplication(Node):
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
-        self.get_logger().info(msg.data)
+        self.get_logger().info(str(msg.data))
 
 
 def main(args=None):
