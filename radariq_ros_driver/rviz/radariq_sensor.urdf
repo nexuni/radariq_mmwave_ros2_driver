@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot name="radariq_sensor">
+
+    <material name="blue">
+        <color rgba="0 0.2 0.63 1"/>
+    </material>
+
+    <link name="radar">
+        <visual>
+            <geometry>
+                <box size="0.6 0.1 0.6"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+    </link>
+</robot>
