@@ -45,16 +45,16 @@ class PointCloudPublisher(Node):
         super().__init__('RadarIQPointCloudNode')
         global riq
 
-        serial_port = self.declare_parameter('serial_port').value
-        framerate = self.declare_parameter('framerate').value
-        distancefilter_min = self.declare_parameter('distancefilter_min').value
-        distancefilter_max = self.declare_parameter('distancefilter_max').value
-        anglefilter_min = self.declare_parameter('anglefilter_min').value
-        anglefilter_max = self.declare_parameter('anglefilter_max').value
-        pointdensity = self.declare_parameter('pointdensity').value
-        certainty = self.declare_parameter('certainty').value
-        topic = self.declare_parameter('topic').value
-        frame_id = self.declare_parameter('frame_id').value
+        serial_port = self.declare_parameter('serial_port', "/dev/radariq").value
+        framerate = self.declare_parameter('framerate', 10).value
+        distancefilter_min = self.declare_parameter('distancefilter_min', 0.0).value
+        distancefilter_max = self.declare_parameter('distancefilter_max', 10.0).value
+        anglefilter_min = self.declare_parameter('anglefilter_min', -45).value
+        anglefilter_max = self.declare_parameter('anglefilter_max', 45).value
+        pointdensity = self.declare_parameter('pointdensity', 0).value
+        certainty = self.declare_parameter('certainty', 5).value
+        topic = self.declare_parameter('topic', "radariq").value
+        frame_id = self.declare_parameter('frame_id', "radar").value
 
         pub = self.create_publisher(PointCloud2, topic, 10)
 
@@ -67,31 +67,31 @@ class PointCloudPublisher(Node):
         header = Header()
         header.frame_id = frame_id
 
-        try:
-            riq = RadarIQ(port=serial_port)
-            riq.set_mode(MODE_POINT_CLOUD)
-            riq.set_units('m', 'm/s')
-            riq.set_frame_rate(framerate)
-            riq.set_distance_filter(distancefilter_min, distancefilter_max)
-            riq.set_angle_filter(anglefilter_min, anglefilter_max)
-            riq.set_point_density(pointdensity)
-            riq.set_certainty(certainty)
-            riq.start()
-            self.get_logger().info('Starting the RadarIQ module')
+        # try:
+        riq = RadarIQ(port=serial_port)
+        riq.set_mode(MODE_POINT_CLOUD)
+        riq.set_units('m', 'm/s')
+        riq.set_frame_rate(framerate)
+        riq.set_distance_filter(distancefilter_min, distancefilter_max)
+        riq.set_angle_filter(anglefilter_min, anglefilter_max)
+        riq.set_point_density(pointdensity)
+        # riq.set_certainty(certainty)
+        riq.start()
+        self.get_logger().info('Starting the RadarIQ module')
 
-            for row in riq.get_data():
-                if not rclpy.ok():
-                    break
-                if row is not None:
-                    pc2 = self.create_cloud(header, fields, row)
-                    pc2.header.stamp = self.get_clock().now().to_msg()
-                    pub.publish(pc2)
+        for row in riq.get_data():
+            if not rclpy.ok():
+                break
+            if row is not None:
+                pc2 = self.create_cloud(header, fields, row)
+                pc2.header.stamp = self.get_clock().now().to_msg()
+                pub.publish(pc2)
 
-        except Exception as error:
-            self.get_logger().error(error)
-        finally:
-            del riq
-            self.get_logger().info("Stopped RadarIQ module")
+        # except Exception as error:
+        #     self.get_logger().error(error)
+        # finally:
+        #     del riq
+        #     self.get_logger().info("Stopped RadarIQ module")
 
     def create_cloud(self, header, fields, points):
         """
@@ -102,7 +102,7 @@ class PointCloudPublisher(Node):
         point_step, pack_into = cloud_struct.size, cloud_struct.pack_into
         offset = 0
         for p in points:
-            pack_into(buff, offset, *p)
+            pack_into(buff, offset, *p[:-1])
             offset += point_step
 
         return PointCloud2(header=header,
