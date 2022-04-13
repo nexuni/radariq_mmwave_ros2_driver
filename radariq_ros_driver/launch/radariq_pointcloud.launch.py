@@ -6,7 +6,8 @@ def generate_launch_description():
     ld = LaunchDescription()
     pointcloud_node = Node(
         package="radariq_ros_driver",
-        node_executable="pointcloud_publisher",
+        executable="pointcloud_publisher",
+        output="screen",
         parameters=[
             {"serial_port": "/dev/radariq"},
             {"frame_id": "radar"},
